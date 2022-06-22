@@ -3,11 +3,88 @@ from xml.dom import NotFoundErr
 from flask import Flask, request
 from pydantic import ValidationError
 from person import Person
+from food_truck import Location, Event, Vendor
 from redis_om import Migrator
 from redis_om.model import NotFoundError
 
 app = Flask(__name__)
 
+def build_locations(locations):
+    response = []
+    for locale in locations:
+        response.append(locale.dict())
+
+    return { "results": response }
+
+def build_events(events):
+    response = []
+    for event in events:
+        response.append(event.dict())
+
+    return { "results": response }
+
+def build_vendors(vendors):
+    response = []
+    for vendor in vendors:
+        response.append(vendor.dict())
+
+    return { "results": response }
+
+@app.route("/vendor/new", methods=["POST"])
+def create_vendor():
+    try:
+        print(request.json)
+        new_vendor = Vendor(**request.json)
+        new_vendor.save()
+        return new_vendor.pk
+
+    except ValidationError as e:
+        print(e)
+        return "Bad request.", 400
+
+@app.route("/event/new", methods=["POST"])
+def create_event():
+    try:
+        print(request.json)
+        new_event = Event(**request.json)
+        new_event.save()
+        return new_event.pk
+
+    except ValidationError as e:
+        print(e)
+        return "Bad request.", 400
+
+@app.route("/location/new", methods=["POST"])
+def create_location():
+    try:
+        print(request.json)
+        new_location = Location(**request.json)
+        new_location.save()
+        return new_location.pk
+
+    except ValidationError as e:
+        print(e)
+        return "Bad request.", 400
+
+# Find vendor with a given food in a given city.
+@app.route("/vendor/byfood/<desired_food>/<city>", methods=["GET"])
+def find_matching_food(desired_food, city):
+    people = Vendor.find(
+        (Vendor.cuisines << desired_food) &
+        (Vendor.vendor_info.city == city)
+    ).all()
+
+    return build_results(people)
+
+
+
+
+
+
+
+
+
+ ####################################################
 # Utility function to format list of People objects as 
 # a results dictionary, for easy conversion to JSON in 
 # API responses.
