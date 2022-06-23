@@ -3,6 +3,7 @@ from xml.dom import NotFoundErr
 from flask import Flask, request
 from pydantic import ValidationError
 from person import Person
+from importlib import reload
 from food_truck import Location, Event, Vendor
 from redis_om import Migrator
 from redis_om.model import NotFoundError

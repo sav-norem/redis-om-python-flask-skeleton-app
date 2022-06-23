@@ -1,15 +1,15 @@
 from email.policy import default
 from textwrap import indent
 from venv import EnvBuilder
-from xmlrpc.client import DateTime
+import datetime
 from redis_om import (EmbeddedJsonModel, Field, JsonModel)
 from pydantic import PositiveInt
 from typing import Optional, List
 
-class Event(EmbeddedJsonModel):
+class Event(JsonModel):
     assignedVendors: PositiveInt = Field(index=True)
-    endTime: DateTime = Field(index=True)
-    startTime: DateTime = Field(index=True)
+    endTime: datetime.datetime = Field(index=True)
+    startTime: datetime.datetime = Field(index=True)
     locationId: str = Field(index=True)
     locationName: str = Field(index=True)
     name: str = Field(index=True)
@@ -23,10 +23,9 @@ class Info(EmbeddedJsonModel):
     state: str = Field(index=True)
     zipcode: str = Field(index=True)
 
-class Location(EmbeddedJsonModel):
+class Location(JsonModel):
     about: str = Field(index=True, full_text_search=True)
     imageUrl: str = Field(index=True)
-
     info: Info
     locationType: str = Field(index=True)
     name: str = Field(index=True, full_text_search=True)
@@ -37,10 +36,10 @@ class Vendor_Info(EmbeddedJsonModel):
     city: str = Field(index=True, full_text_search=True)
     state: str = Field(index=True, full_text_search=True)
     
-class Vendor(EmbeddedJsonModel):
+class Vendor(JsonModel):
     bannerUrl: Optional[str] = Field(index=False)
-    cuisines: list = Field(index=True, full_text_search=True, default=['none', 'no'])
-    events: list = Field(index=True, full_text_search=True, default=['none', 'no'])
+    cuisines: List[str] = Field(index=True)
+    events: List[str] = Field(index=True)
     bannerUrl: Optional[str] = Field(index=False)
     id: str = Field(index=False)
     logoUrl: Optional[str] = Field(index=False)
