@@ -77,8 +77,13 @@ def find_matching_food(desired_food, city):
 
     return build_results(people)
 
+@app.route("/event/bycount/<int:num_vendors>", methods=["GET"])
+def more_than_x_vendors(num_vendors):
+    match_events = Event.find(
+        Event.assignedVendors >= num_vendors
+    ).all()
 
-
+    return str(len(match_events))
 
 
 
